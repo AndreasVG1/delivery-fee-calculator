@@ -43,9 +43,6 @@ weather conditions.
 - [ ] Wind speed based extra fees are applied correctly based on vehicle type and wind speed.
 - [ ] Weather phenomenon based extra fees are applied correctly based on vehicle type and phenomenon.
 - [ ] Restricted delivery conditions are handled according to the specification.
-- [ ] Regional base fees and weather-related extra fees can be managed through the REST interface.
-- [ ] Creating or updating a temperature or wind rule is rejected if its range overlaps another rule of the same type and vehicle type. Tests cover unbounded ranges, equal endpoints with each inclusivity combination, and adjacent non-overlapping ranges.
-- [ ] Concurrent creates or updates of overlapping rules cannot both succeed; after the requests finish, the stored ranges for each rule type and vehicle type remain non-overlapping.
 
 ### FR-04: REST API
 
@@ -58,7 +55,17 @@ weather conditions.
 - [ ] Valid requests return the calculated delivery fee based on the city, vehicle type and optional datetime.
 - [ ] Invalid requests return appropriate error responses.
 
-### FR-05: Delivery Fee Calculation Storage
+### FR-05: Business rules REST interface
+
+**Description:** The regional base fees and weather-related extra fees must configurable through a REST interface.
+
+**Acceptance Criteria:**
+
+- [ ] Regional base fees and weather-related extra fees can be managed through the REST interface.
+- [ ] Creating or updating a temperature or wind rule is rejected if its range overlaps another rule of the same type and vehicle type. Tests cover unbounded ranges, equal endpoints with each inclusivity combination, and adjacent non-overlapping ranges.
+- [ ] Concurrent creates or updates of overlapping rules cannot both succeed; after the requests finish, the stored ranges for each rule type and vehicle type remain non-overlapping.
+
+### FR-06: Delivery Fee Calculation Storage
 
 **Description:** The application must store delivery fee calculations so recorded results can be displayed after fee rules change.
 
@@ -206,13 +213,14 @@ If no successful calculation matches, the application must use the nearest weath
 
 ## 6. Requirement Traceability
 
-| Requirement | Implementation | Test | Status      |
-|-------------|----------------|------|-------------|
-| FR-01       | `WeatherObservation`, `WeatherRepository` | `WeatherRepositoryTest` (H2) | Completed |
-| FR-02       | `WeatherClient`, `WeatherImportService`, `ImportScheduler` | `WeatherClientTest`, `WeatherImportServiceTest` (H2), `ImportSchedulerTest`, `ImportSchedulerConfigurationTest` | Completed |
-| FR-03       |                |      | Not started |
-| FR-04       |                |      | Not started |
-| FR-05       |                |      | Not started |
+| Requirement | Implementation                                             | Test                                                                                                            | Status      |
+|-------------|------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|-------------|
+| FR-01       | `WeatherObservation`, `WeatherRepository`                  | `WeatherRepositoryTest` (H2)                                                                                    | Completed   |
+| FR-02       | `WeatherClient`, `WeatherImportService`, `ImportScheduler` | `WeatherClientTest`, `WeatherImportServiceTest` (H2), `ImportSchedulerTest`, `ImportSchedulerConfigurationTest` | Completed   |
+| FR-03       |                                                            |                                                                                                                 | Not started |
+| FR-04       |                                                            |                                                                                                                 | Not started |
+| FR-05       |                                                            |                                                                                                                 | Not started |
+| FR-06       |                                                            |                                                                                                                 | Not started |
 
 ---
 
