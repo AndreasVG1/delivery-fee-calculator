@@ -71,6 +71,8 @@ weather conditions.
 
 ## 4. Business Rules
 
+These are the default rules. Rules can be managed from a separate REST interface. 
+
 ### 4.1 Delivery Fee Formula
 
 **BR-01:** The total delivery fee is calculated as:
