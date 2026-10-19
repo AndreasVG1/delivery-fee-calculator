@@ -14,4 +14,7 @@ public interface WeatherRepository extends JpaRepository<WeatherObservation, Lon
      * @return the station's observations, oldest first
      */
     List<WeatherObservation> findAllByWmoCodeOrderByObservedAtAsc(String wmoCode);
+
+    /** Returns whether the observation key already exists. */
+    boolean existsByWmoCodeAndObservedAt(String wmoCode, java.time.OffsetDateTime observedAt);
 }

@@ -25,12 +25,12 @@ weather conditions.
 
 **Acceptance Criteria:**
 
-- [ ] Weather data is retrieved from
+- [x] Weather data is retrieved from
   the [weather portal](https://www.ilmateenistus.ee/ilma_andmed/xml/observations.php).
-- [ ] Imported observations are persisted.
-- [ ] CronJob is used for scheduling requests.
-- [ ] The default request frequency is once every hour, 15 minutes after a full hour (HH:15:00)
-- [ ] Import frequency is configurable.
+- [x] Imported observations are persisted.
+- [x] CronJob is used for scheduling requests.
+- [x] The default request frequency is once every hour, 15 minutes after a full hour (HH:15:00)
+- [x] Import frequency is configurable.
 
 ### FR-03: Delivery Fee Calculation
 
@@ -209,7 +209,7 @@ If no successful calculation matches, the application must use the nearest weath
 | Requirement | Implementation | Test | Status      |
 |-------------|----------------|------|-------------|
 | FR-01       | `WeatherObservation`, `WeatherRepository` | `WeatherRepositoryTest` (H2) | Completed |
-| FR-02       |                |      | Not started |
+| FR-02       | `WeatherClient`, `WeatherImportService`, `ImportScheduler` | `WeatherClientTest`, `WeatherImportServiceTest` (H2), `ImportSchedulerTest`, `ImportSchedulerConfigurationTest` | Completed |
 | FR-03       |                |      | Not started |
 | FR-04       |                |      | Not started |
 | FR-05       |                |      | Not started |
