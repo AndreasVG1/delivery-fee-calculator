@@ -11,11 +11,13 @@ import java.util.Locale;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Exposes delivery fee calculations over HTTP. */
 @RestController
+@RequestMapping("/api/delivery-fee")
 public class DeliveryFeeController {
     private static final String NO_WEATHER = "No weather data available for the requested time";
     private final DeliveryFeeService deliveryFeeService;
@@ -26,7 +28,7 @@ public class DeliveryFeeController {
     }
 
     /** Calculates a delivery fee for the required city and vehicle and optional ISO-8601 offset datetime. */
-    @GetMapping("/api/delivery-fee")
+    @GetMapping()
     public ResponseEntity<?> calculate(@RequestParam(required = false) String city,
             @RequestParam(required = false) String vehicleType,
             @RequestParam(required = false) String datetime) {

@@ -16,6 +16,24 @@ public class WindFeeRule {
     @Enumerated(EnumType.STRING) @Column(nullable = false) private RuleOutcome outcome;
     @Column(name = "fee_amount", nullable = false) private BigDecimal feeAmount;
     protected WindFeeRule() {}
+    /** Creates a wind rule with the supplied bounds and outcome. */
+    WindFeeRule(VehicleType vehicleType, BigDecimal lowerThreshold, BigDecimal upperThreshold,
+            boolean lowerInclusive, boolean upperInclusive, RuleOutcome outcome, BigDecimal feeAmount) {
+        replace(vehicleType, lowerThreshold, upperThreshold, lowerInclusive, upperInclusive, outcome, feeAmount);
+    }
+    /** Returns the persistent ID. */
+    public Long getId() { return id; }
+    /** Replaces all configurable fields. */
+    void replace(VehicleType vehicleType, BigDecimal lowerThreshold, BigDecimal upperThreshold,
+            boolean lowerInclusive, boolean upperInclusive, RuleOutcome outcome, BigDecimal feeAmount) {
+        this.vehicleType = vehicleType;
+        this.lowerThreshold = lowerThreshold;
+        this.upperThreshold = upperThreshold;
+        this.lowerInclusive = lowerInclusive;
+        this.upperInclusive = upperInclusive;
+        this.outcome = outcome;
+        this.feeAmount = feeAmount;
+    }
     /** Returns the vehicle type to which this rule applies. */
     public VehicleType getVehicleType() { return vehicleType; }
     /** Returns the lower wind-speed bound, or null when unbounded. */

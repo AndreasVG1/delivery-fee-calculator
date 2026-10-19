@@ -15,6 +15,23 @@ public class TemperatureFeeRule {
     @Column(name = "upper_inclusive", nullable = false) private boolean upperInclusive;
     @Column(name = "fee_amount", nullable = false) private BigDecimal feeAmount;
     protected TemperatureFeeRule() {}
+    /** Creates a temperature rule with the supplied bounds and amount. */
+    TemperatureFeeRule(VehicleType vehicleType, BigDecimal lowerThreshold, BigDecimal upperThreshold,
+            boolean lowerInclusive, boolean upperInclusive, BigDecimal feeAmount) {
+        replace(vehicleType, lowerThreshold, upperThreshold, lowerInclusive, upperInclusive, feeAmount);
+    }
+    /** Returns the persistent ID. */
+    public Long getId() { return id; }
+    /** Replaces all configurable fields. */
+    void replace(VehicleType vehicleType, BigDecimal lowerThreshold, BigDecimal upperThreshold,
+            boolean lowerInclusive, boolean upperInclusive, BigDecimal feeAmount) {
+        this.vehicleType = vehicleType;
+        this.lowerThreshold = lowerThreshold;
+        this.upperThreshold = upperThreshold;
+        this.lowerInclusive = lowerInclusive;
+        this.upperInclusive = upperInclusive;
+        this.feeAmount = feeAmount;
+    }
     /** Returns the vehicle type to which this rule applies. */
     public VehicleType getVehicleType() { return vehicleType; }
     /** Returns the lower temperature bound, or null when unbounded. */

@@ -61,9 +61,9 @@ weather conditions.
 
 **Acceptance Criteria:**
 
-- [ ] Regional base fees and weather-related extra fees can be managed through the REST interface.
-- [ ] Creating or updating a temperature or wind rule is rejected if its range overlaps another rule of the same type and vehicle type. Tests cover unbounded ranges, equal endpoints with each inclusivity combination, and adjacent non-overlapping ranges.
-- [ ] Concurrent creates or updates of overlapping rules cannot both succeed; after the requests finish, the stored ranges for each rule type and vehicle type remain non-overlapping.
+- [x] Regional base fees and weather-related extra fees can be managed through the REST interface.
+- [x] Creating or updating a temperature or wind rule is rejected if its range overlaps another rule of the same type and vehicle type. Tests cover unbounded ranges, equal endpoints with each inclusivity combination, and adjacent non-overlapping ranges.
+- [x] Concurrent creates or updates of overlapping rules cannot both succeed; after the requests finish, the stored ranges for each rule type and vehicle type remain non-overlapping.
 
 ### FR-06: Delivery Fee Calculation Storage
 
@@ -219,7 +219,7 @@ If no successful calculation matches, the application must use the nearest weath
 | FR-02       | `WeatherClient`, `WeatherImportService`, `ImportScheduler` | `WeatherClientTest`, `WeatherImportServiceTest` (H2), `ImportSchedulerTest`, `ImportSchedulerConfigurationTest` | Completed   |
 | FR-03       | `FeeConfigurationService`, `FeeCalculator`, `DeliveryFeeService` | `FeeCalculatorTest`, `DeliveryFeeServiceTest`                                                   | Completed   |
 | FR-04       | `DeliveryFeeController`                                    | `DeliveryFeeControllerTest` (MockMvc, Spring context, H2)                                                       | Completed   |
-| FR-05       |                                                            |                                                                                                                 | Not started |
+| FR-05       | `FeeConfigurationController`, `FeeConfigurationService`, four entity-specific fee rule repositories | `FeeConfigurationControllerTest` (MockMvc, Spring context, H2; CRUD, validation, range boundaries, concurrent writes, delivery-fee integration) | Completed   |
 | FR-06       |                                                            |                                                                                                                 | Not started |
 
 ---

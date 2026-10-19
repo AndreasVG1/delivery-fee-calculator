@@ -43,6 +43,32 @@ Errors use `{"error":"..."}`: malformed or missing parameters return `400`,
 missing weather data returns `404`, and forbidden vehicles or uncovered fee
 rules return `422`.
 
+## Fee configuration API
+
+Manage active regional base fees and weather fee rules under
+`/api/configurations`. Each collection supports `GET` to list and `POST` to
+create; each resource supports `GET`, `PUT`, and `DELETE` by numeric ID:
+
+- `/api/configurations/base-fees`
+- `/api/configurations/temperature-rules`
+- `/api/configurations/wind-rules`
+- `/api/configurations/phenomenon-rules`
+
+`PUT` replaces every field. JSON uses the entity field names and canonical enum
+values (`TALLINN`, `CAR`, `SURCHARGE`, and so on). Range rules require at least
+one threshold and cannot overlap another rule of the same type and vehicle;
+null thresholds are unbounded. Base fees are unique by city and vehicle, and
+phenomenon rules are unique by phenomenon and vehicle. Create returns `201`
+with a `Location` header, reads and updates return `200`, and deletion returns
+`204`. Invalid data returns `400`, missing IDs return `404`, and duplicate or
+overlapping rules return `409`; errors use `{"error":"..."}`.
+
+For example, list the active temperature rules:
+
+```sh
+curl -i http://localhost:8080/api/configurations/temperature-rules
+```
+
 ## Weather data import
 
 The application imports observations for Tallinn-Harku, Tartu-Tõravere, and

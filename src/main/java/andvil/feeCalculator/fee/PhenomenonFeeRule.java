@@ -13,6 +13,21 @@ public class PhenomenonFeeRule {
     @Enumerated(EnumType.STRING) @Column(nullable = false) private RuleOutcome outcome;
     @Column(name = "fee_amount", nullable = false) private BigDecimal feeAmount;
     protected PhenomenonFeeRule() {}
+    /** Creates a phenomenon rule for the supplied vehicle and condition. */
+    PhenomenonFeeRule(VehicleType vehicleType, WeatherPhenomenon phenomenon,
+            RuleOutcome outcome, BigDecimal feeAmount) {
+        replace(vehicleType, phenomenon, outcome, feeAmount);
+    }
+    /** Returns the persistent ID. */
+    public Long getId() { return id; }
+    /** Replaces all configurable fields. */
+    void replace(VehicleType vehicleType, WeatherPhenomenon phenomenon,
+            RuleOutcome outcome, BigDecimal feeAmount) {
+        this.vehicleType = vehicleType;
+        this.phenomenon = phenomenon;
+        this.outcome = outcome;
+        this.feeAmount = feeAmount;
+    }
     /** Returns the vehicle type to which this rule applies. */
     public VehicleType getVehicleType() { return vehicleType; }
     /** Returns the matched weather-phenomenon category. */
