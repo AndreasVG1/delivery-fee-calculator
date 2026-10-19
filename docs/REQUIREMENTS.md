@@ -44,6 +44,8 @@ weather conditions.
 - [ ] Weather phenomenon based extra fees are applied correctly based on vehicle type and phenomenon.
 - [ ] Restricted delivery conditions are handled according to the specification.
 - [ ] Regional base fees and weather-related extra fees can be managed through the REST interface.
+- [ ] Creating or updating a temperature or wind rule is rejected if its range overlaps another rule of the same type and vehicle type. Tests cover unbounded ranges, equal endpoints with each inclusivity combination, and adjacent non-overlapping ranges.
+- [ ] Concurrent creates or updates of overlapping rules cannot both succeed; after the requests finish, the stored ranges for each rule type and vehicle type remain non-overlapping.
 
 ### FR-04: REST API
 
