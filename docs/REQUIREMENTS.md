@@ -50,10 +50,10 @@ weather conditions.
 
 **Acceptance Criteria:**
 
-- [ ] Endpoint accepts the required input parameters (city and vehicle type).
-- [ ] Endpoint accepts an optional datetime parameter.
-- [ ] Valid requests return the calculated delivery fee based on the city, vehicle type and optional datetime.
-- [ ] Invalid requests return appropriate error responses.
+- [x] Endpoint accepts the required input parameters (city and vehicle type).
+- [x] Endpoint accepts an optional datetime parameter.
+- [x] Valid requests return the calculated delivery fee based on the city, vehicle type and optional datetime.
+- [x] Invalid requests return appropriate error responses.
 
 ### FR-05: Business rules REST interface
 
@@ -218,7 +218,7 @@ If no successful calculation matches, the application must use the nearest weath
 | FR-01       | `WeatherObservation`, `WeatherRepository`                  | `WeatherRepositoryTest` (H2)                                                                                    | Completed   |
 | FR-02       | `WeatherClient`, `WeatherImportService`, `ImportScheduler` | `WeatherClientTest`, `WeatherImportServiceTest` (H2), `ImportSchedulerTest`, `ImportSchedulerConfigurationTest` | Completed   |
 | FR-03       | `FeeConfigurationService`, `FeeCalculator`, `DeliveryFeeService` | `FeeCalculatorTest`, `DeliveryFeeServiceTest`                                                   | Completed   |
-| FR-04       |                                                            |                                                                                                                 | Not started |
+| FR-04       | `DeliveryFeeController`                                    | `DeliveryFeeControllerTest` (MockMvc, Spring context, H2)                                                       | Completed   |
 | FR-05       |                                                            |                                                                                                                 | Not started |
 | FR-06       |                                                            |                                                                                                                 | Not started |
 

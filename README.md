@@ -18,6 +18,31 @@ reapplying the scripts. The database console is available at <http://localhost:8
 Stop the application with `docker compose down`; the database volume is kept.
 To remove the database as well, run `docker compose down --volumes`.
 
+## Delivery fee API
+
+Request a delivery fee with `GET /api/delivery-fee`. The `city` and
+`vehicleType` query parameters are required; `datetime` is optional and must
+be an ISO 8601 date-time with an offset. If omitted, the service uses current
+conditions.
+
+```sh
+curl --get 'http://localhost:8080/api/delivery-fee' \
+  --data-urlencode 'city=Tartu' \
+  --data-urlencode 'vehicleType=Scooter' \
+  --data-urlencode 'datetime=2025-01-15T12:00:00Z'
+```
+
+A successful response contains the canonical city and vehicle names, the
+requested datetime (or `null` when omitted), and the numeric total fee:
+
+```json
+{"city":"TARTU","vehicleType":"SCOOTER","requestedAt":"2025-01-15T12:00:00Z","totalFee":5.00}
+```
+
+Errors use `{"error":"..."}`: malformed or missing parameters return `400`,
+missing weather data returns `404`, and forbidden vehicles or uncovered fee
+rules return `422`.
+
 ## Weather data import
 
 The application imports observations for Tallinn-Harku, Tartu-Tõravere, and
