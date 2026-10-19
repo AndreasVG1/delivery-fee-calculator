@@ -15,6 +15,7 @@ weather conditions.
 **Acceptance Criteria:**
 
 - [ ] Weather observations contain all required fields.
+- [ ] The imported weather phenomenon is retained as the exact API string; any mapping to fee-rule values is performed separately.
 - [ ] Weather observations can be persisted and retrieved.
 - [ ] New imports do not overwrite historical records.
 
@@ -54,6 +55,17 @@ weather conditions.
 - [ ] Endpoint accepts an optional datetime parameter.
 - [ ] Valid requests return the calculated delivery fee based on the city, vehicle type and optional datetime.
 - [ ] Invalid requests return appropriate error responses.
+
+### FR-05: Delivery Fee Calculation Storage
+
+**Description:** The application must store delivery fee calculations so recorded results can be displayed after fee rules change.
+
+**Acceptance Criteria:**
+
+- [ ] Each calculation stores its request details, calculation datetime, the selected weather observation when available, and its component fees and total when successful.
+- [ ] Failed calculations can be stored with an error message and no total fee.
+- [ ] Retrieving a stored calculation returns the recorded values without recalculating them using current fee rules.
+- [ ] A successful stored calculation is eligible for reuse only when its city and vehicle type match and its referenced observation's `observed_at` is within 24 hours of the requested datetime.
 
 ## 3. Non-Functional Requirements
 
@@ -141,6 +153,49 @@ Restrictions:
 - Bike: Wind speed greater than 20 m/s.
 - Scooter and Bike: Glaze, hail, or thunder.
 
+### 4.7 Threshold Rule Ranges
+
+**BR-07:** Temperature and wind fee rules may have a nullable `lower_threshold`, a nullable `upper_threshold`, or both. At least one threshold must be present. A null lower threshold means the range has no lower bound; a null upper threshold means it has no upper bound. Inclusivity flags determine whether a value equal to a present threshold is included.
+
+For example, a rule for air temperature less than -10°C has `lower_threshold = NULL`, `upper_threshold = -10.0`, and an exclusive upper bound.
+
+**BR-08:** Threshold ranges for the same rule type and vehicle type must not overlap. Creating a rule whose range overlaps an existing rule's range must be rejected.
+
+**BR-09:** If a measured temperature or wind speed falls into no configured rule range during fee calculation, calculation must return an error instead of a fee.
+
+**Error message:**
+`Uncovered range`
+
+### 4.8 Regional Base Fee Uniqueness
+
+**BR-10:** Only one regional base fee may exist for a given city and vehicle type. Creating a regional base fee when one already exists for that pair must be rejected.
+
+### 4.9 Weather Observation Selection
+
+**BR-11:** The weather station for each city is:
+
+| City    | Weather station |
+|---------|-----------------|
+| Tallinn | Tallinn-Harku   |
+| Tartu   | Tartu-Tõravere  |
+| Pärnu   | Pärnu           |
+
+For the requested datetime, the calculator must use the observation from the mapped station whose `observed_at` timestamp is nearest to the requested datetime, provided the absolute difference is no more than 24 hours. If no observation falls within that window, calculation must return an error instead of a fee.
+
+**Error message:**
+`No weather data available for the requested time`
+
+### 4.10 Delivery Fee Calculation
+
+**BR-12:** Each delivery fee calculation must be stored as a `DeliveryFeeCalculation` containing its ID, requested datetime, calculation datetime, city, vehicle type, a reference to the selected weather observation when one is available, regional base fee (`rbf`), temperature extra fee (`atef`), wind speed extra fee (`wsef`), weather phenomenon extra fee (`wpef`), and total fee when successful. The entity may contain an `error_message` when calculation fails; in that case, no total fee is returned.
+
+**BR-13:** For a request with a datetime, the application must first look for a successful `DeliveryFeeCalculation` whose city and vehicle type match the request and whose referenced weather observation's `observed_at` is within 24 hours of the requested datetime. If multiple calculations match, the one referencing the nearest observation must be used. The stored component amounts and total are returned without recalculation using current rules.
+
+If no successful calculation matches, the application must use the nearest weather observation from the station mapped to the requested city, provided its `observed_at` is within 24 hours of the requested datetime, and calculate using currently active fee rules. If no matching observation is available, calculation must return an error.
+
+**Error message:**
+`No weather data available for the requested time`
+
 ## 5. Open Questions and Assumptions
 
 | ID   | Question / Assumption                                                                                          | Resolution                 |
@@ -155,6 +210,7 @@ Restrictions:
 | FR-02       |                |      | Not started |
 | FR-03       |                |      | Not started |
 | FR-04       |                |      | Not started |
+| FR-05       |                |      | Not started |
 
 ---
 
