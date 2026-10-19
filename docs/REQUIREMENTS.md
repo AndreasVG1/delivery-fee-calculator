@@ -14,10 +14,10 @@ weather conditions.
 
 **Acceptance Criteria:**
 
-- [ ] Weather observations contain all required fields.
-- [ ] The imported weather phenomenon is retained as the exact API string; any mapping to fee-rule values is performed separately.
-- [ ] Weather observations can be persisted and retrieved.
-- [ ] New imports do not overwrite historical records.
+- [x] Weather observations contain all required fields.
+- [x] The imported weather phenomenon is retained as the exact API string; any mapping to fee-rule values is performed separately.
+- [x] Weather observations can be persisted and retrieved.
+- [x] New imports do not overwrite historical records.
 
 ### FR-02: Weather Data Import
 
@@ -208,7 +208,7 @@ If no successful calculation matches, the application must use the nearest weath
 
 | Requirement | Implementation | Test | Status      |
 |-------------|----------------|------|-------------|
-| FR-01       |                |      | Not started |
+| FR-01       | `WeatherObservation`, `WeatherRepository` | `WeatherRepositoryTest` (H2) | Completed |
 | FR-02       |                |      | Not started |
 | FR-03       |                |      | Not started |
 | FR-04       |                |      | Not started |
