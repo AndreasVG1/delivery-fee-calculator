@@ -32,16 +32,33 @@ curl --get 'http://localhost:8080/api/delivery-fee' \
   --data-urlencode 'datetime=2025-01-15T12:00:00Z'
 ```
 
-A successful response contains the canonical city and vehicle names, the
-requested datetime (or `null` when omitted), and the numeric total fee:
+A successful response contains the saved calculation `id`, canonical city and
+vehicle names, the requested datetime (or `null` when omitted), and the numeric
+total fee:
 
 ```json
-{"city":"TARTU","vehicleType":"SCOOTER","requestedAt":"2025-01-15T12:00:00Z","totalFee":5.00}
+{"id":42,"city":"TARTU","vehicleType":"SCOOTER","requestedAt":"2025-01-15T12:00:00Z","totalFee":5.00}
 ```
 
-Errors use `{"error":"..."}`: malformed or missing parameters return `400`,
-missing weather data returns `404`, and forbidden vehicles or uncovered fee
-rules return `422`.
+Every new calculation from a valid request is recorded, including requests
+that produce a business failure. Those errors include the saved calculation
+`id`. Invalid parameters return `400` without creating a record; missing weather
+data returns `404`, and forbidden vehicles or uncovered fee rules return `422`.
+
+Retrieve a recorded result with `GET /api/delivery-fee/{id}`. The response
+contains the original request and calculation times, city, vehicle, weather
+observation ID, component amounts, total, and error message. Retrieval does not
+recalculate using current fee rules. Saved records have no update or delete
+endpoint.
+
+When `datetime` is supplied, the service first looks for a successful saved
+calculation for the same city and vehicle whose weather observation is within
+24 hours of the requested time. It returns the closest observation's saved
+result. Ties use the newest calculation time, then the lowest record ID. A
+reused result keeps its original ID and timestamps. If there is no match, the
+service selects the nearest current observation within the same inclusive
+24-hour window and calculates using active rules. Requests without `datetime`
+always create a new record.
 
 ## Fee configuration API
 

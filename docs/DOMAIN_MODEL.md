@@ -83,9 +83,11 @@ The weather rules apply as follows:
 
 For a request with a datetime, calculation history is checked first. A successful `DeliveryFeeCalculation` is reusable when its city and vehicle type match the request and its referenced observation's `observed_at` is within 24 hours of the requested datetime. The closest matching observation is preferred. If no stored calculation matches, the calculator uses the nearest observation from the mapped station within 24 hours and calculates using the currently active rules. If neither a calculation nor an observation is available within that window, the request fails with `No weather data available for the requested time`.
 
+When multiple successful calculations reference observations equally close to the requested datetime, the newest `calculated_at` wins, then the lowest calculation ID. The 24-hour window includes its endpoints. Reuse returns the original record, including its ID and timestamps. Calculation history is append-only through the application: retrieval does not recalculate values, and there are no update or delete endpoints.
+
 The default thresholds and amounts are detailed in the business rules in [`REQUIREMENTS.md`](./REQUIREMENTS.md). The class diagram models these as configurable rule records rather than embedding the threshold values in the entity definitions.
 
 ## Model notes and open points
 
 - `WeatherObservation.phenomenon` remains a `String` to preserve the exact value returned by the weather API. A separate mapping translates it for comparison with the `WeatherPhenomenon` values used by fee rules.
-- If multiple successful calculations have equally near referenced observation times, or multiple weather observations are equally near, the selection tie-break is not defined yet.
+- Equally near weather observations are resolved by earlier `observed_at`, then lowest observation ID. Calculation history ties use newest calculation time, then lowest calculation ID.

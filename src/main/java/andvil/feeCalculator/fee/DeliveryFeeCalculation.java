@@ -4,9 +4,11 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import andvil.feeCalculator.weather.WeatherObservation;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Immutable;
 
-/** A returned calculation result, ready for persistence in the later storage phase. */
+/** An immutable saved outcome of a delivery fee request. */
 @Entity
+@Immutable
 @Table(name = "delivery_fee_calculation")
 public class DeliveryFeeCalculation {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
@@ -32,7 +34,7 @@ public class DeliveryFeeCalculation {
         this.atef = atef; this.wsef = wsef; this.wpef = wpef; this.totalFee = totalFee;
         this.errorMessage = errorMessage;
     }
-    /** Returns the generated record identifier, which is null before FR-06 persistence. */
+    /** Returns the generated record identifier. */
     public Long getId() { return id; }
     /** Returns the requested time, or null when the caller requested current conditions. */
     public OffsetDateTime getRequestedAt() { return requestedAt; }

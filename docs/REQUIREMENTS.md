@@ -71,10 +71,10 @@ weather conditions.
 
 **Acceptance Criteria:**
 
-- [ ] Each calculation stores its request details, calculation datetime, the selected weather observation when available, and its component fees and total when successful.
-- [ ] Failed calculations can be stored with an error message and no total fee.
-- [ ] Retrieving a stored calculation returns the recorded values without recalculating them using current fee rules.
-- [ ] A successful stored calculation is eligible for reuse only when its city and vehicle type match and its referenced observation's `observed_at` is within 24 hours of the requested datetime.
+- [x] Each calculation stores its request details, calculation datetime, the selected weather observation when available, and its component fees and total when successful.
+- [x] Failed calculations can be stored with an error message and no total fee.
+- [x] Retrieving a stored calculation returns the recorded values without recalculating them using current fee rules.
+- [x] A successful stored calculation is eligible for reuse only when its city and vehicle type match and its referenced observation's `observed_at` is within 24 hours of the requested datetime.
 
 ## 3. Non-Functional Requirements
 
@@ -220,7 +220,7 @@ If no successful calculation matches, the application must use the nearest weath
 | FR-03       | `FeeConfigurationService`, `FeeCalculator`, `DeliveryFeeService` | `FeeCalculatorTest`, `DeliveryFeeServiceTest`                                                   | Completed   |
 | FR-04       | `DeliveryFeeController`                                    | `DeliveryFeeControllerTest` (MockMvc, Spring context, H2)                                                       | Completed   |
 | FR-05       | `FeeConfigurationController`, `FeeConfigurationService`, four entity-specific fee rule repositories | `FeeConfigurationControllerTest` (MockMvc, Spring context, H2; CRUD, validation, range boundaries, concurrent writes, delivery-fee integration) | Completed   |
-| FR-06       |                                                            |                                                                                                                 | Not started |
+| FR-06       | `DeliveryFeeCalculation`, `DeliveryFeeCalculationRepository`, `DeliveryFeeService`, `DeliveryFeeController` | `DeliveryFeeServiceTest` (H2), `DeliveryFeeControllerTest` (MockMvc, Spring context, H2) | Completed |
 
 ---
 

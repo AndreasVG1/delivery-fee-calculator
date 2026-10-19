@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityManager;
 
 @SpringBootTest
 @Transactional
@@ -22,10 +23,11 @@ class DeliveryFeeServiceTest {
     @Autowired private DeliveryFeeService service;
     @Autowired private WeatherRepository weatherRepository;
     @Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired private EntityManager entityManager;
     private int nextWmoCode;
 
     @BeforeEach
-    void clearWeather() { weatherRepository.deleteAll(); weatherRepository.flush(); nextWmoCode = 0; }
+    void clearWeather() { jdbcTemplate.update("delete from delivery_fee_calculation"); weatherRepository.deleteAll(); weatherRepository.flush(); nextWmoCode = 0; }
 
     @Test
     void calculatesCombinedFeesFromCityVehicleAndObservedWeather() {
@@ -39,7 +41,7 @@ class DeliveryFeeServiceTest {
         assertThat(result.getWsef()).isEqualByComparingTo("0.00");
         assertThat(result.getWpef()).isEqualByComparingTo("1.00");
         assertThat(result.getTotalFee()).isEqualByComparingTo("5.00");
-        assertThat(result.getId()).isNull();
+        assertThat(result.getId()).isNotNull();
     }
 
     @Test
@@ -48,7 +50,7 @@ class DeliveryFeeServiceTest {
         DeliveryFeeCalculation atMinusTen = service.calculate(City.TALLINN, VehicleType.BIKE, REQUESTED_AT);
         assertThat(atMinusTen.getAtef()).isEqualByComparingTo("0.50");
 
-        weatherRepository.deleteAll();
+        clearHistory(); weatherRepository.deleteAll();
         addWeather("Tallinn-Harku", "0", "0", "Clear", REQUESTED_AT);
         DeliveryFeeCalculation atZero = service.calculate(City.TALLINN, VehicleType.BIKE, REQUESTED_AT);
         assertThat(atZero.getAtef()).isEqualByComparingTo("0.00");
@@ -60,12 +62,12 @@ class DeliveryFeeServiceTest {
         assertThat(service.calculate(City.PÄRNU, VehicleType.BIKE, REQUESTED_AT).getWsef())
                 .isEqualByComparingTo("0.50");
 
-        weatherRepository.deleteAll();
+        clearHistory(); weatherRepository.deleteAll();
         addWeather("Pärnu", "5", "20", "Clear", REQUESTED_AT);
         assertThat(service.calculate(City.PÄRNU, VehicleType.BIKE, REQUESTED_AT).getWsef())
                 .isEqualByComparingTo("0.50");
 
-        weatherRepository.deleteAll();
+        clearHistory(); weatherRepository.deleteAll();
         addWeather("Pärnu", "5", "20.001", "Clear", REQUESTED_AT);
         DeliveryFeeCalculation forbidden = service.calculate(City.PÄRNU, VehicleType.BIKE, REQUESTED_AT);
         assertThat(forbidden.getErrorMessage()).isEqualTo("Usage of selected vehicle type is forbidden");
@@ -80,32 +82,32 @@ class DeliveryFeeServiceTest {
         assertThat(service.calculate(City.TALLINN, VehicleType.SCOOTER, REQUESTED_AT).getWpef())
                 .isEqualByComparingTo("0.50");
 
-        weatherRepository.deleteAll();
+        clearHistory(); weatherRepository.deleteAll();
         addWeather("Tallinn-Harku", "5", "0", "Light snow shower", REQUESTED_AT);
         assertThat(service.calculate(City.TALLINN, VehicleType.SCOOTER, REQUESTED_AT).getWpef())
                 .isEqualByComparingTo("1.00");
 
-        weatherRepository.deleteAll();
+        clearHistory(); weatherRepository.deleteAll();
         addWeather("Tallinn-Harku", "5", "0", "Light shower", REQUESTED_AT);
         assertThat(service.calculate(City.TALLINN, VehicleType.SCOOTER, REQUESTED_AT).getWpef())
                 .isEqualByComparingTo("0.50");
 
-        weatherRepository.deleteAll();
+        clearHistory(); weatherRepository.deleteAll();
         addWeather("Tallinn-Harku", "5", "0", "Unexpected rain advisory", REQUESTED_AT);
         assertThat(service.calculate(City.TALLINN, VehicleType.SCOOTER, REQUESTED_AT).getWpef())
                 .isEqualByComparingTo("0.00");
 
-        weatherRepository.deleteAll();
+        clearHistory(); weatherRepository.deleteAll();
         addWeather("Tallinn-Harku", "5", "0", "Hail", REQUESTED_AT);
         DeliveryFeeCalculation hail = service.calculate(City.TALLINN, VehicleType.SCOOTER, REQUESTED_AT);
         assertThat(hail.getErrorMessage()).isEqualTo("Usage of selected vehicle type is forbidden");
 
-        weatherRepository.deleteAll();
+        clearHistory(); weatherRepository.deleteAll();
         addWeather("Tallinn-Harku", "5", "0", "Glaze", REQUESTED_AT);
         DeliveryFeeCalculation forbidden = service.calculate(City.TALLINN, VehicleType.SCOOTER, REQUESTED_AT);
         assertThat(forbidden.getErrorMessage()).isEqualTo("Usage of selected vehicle type is forbidden");
 
-        weatherRepository.deleteAll();
+        clearHistory(); weatherRepository.deleteAll();
         addWeather("Tallinn-Harku", "5", "0", "Thunderstorm", REQUESTED_AT);
         assertThat(service.calculate(City.TALLINN, VehicleType.SCOOTER, REQUESTED_AT).getErrorMessage())
                 .isEqualTo("Usage of selected vehicle type is forbidden");
@@ -121,7 +123,7 @@ class DeliveryFeeServiceTest {
         assertThat(result.getWeatherObservation().getId()).isEqualTo(nearest.getId());
         assertThat(result.getTotalFee()).isEqualByComparingTo("4.00");
 
-        weatherRepository.deleteAll();
+        clearHistory(); weatherRepository.deleteAll();
         WeatherObservation boundary = addWeather("Tallinn-Harku", "5", "0", "Clear", REQUESTED_AT.plusHours(24));
         assertThat(service.calculate(City.TALLINN, VehicleType.CAR, REQUESTED_AT).getWeatherObservation().getId())
                 .isEqualTo(boundary.getId());
@@ -137,6 +139,64 @@ class DeliveryFeeServiceTest {
         assertThat(result.getRequestedAt()).isNull();
         assertThat(result.getWeatherObservation().getId()).isEqualTo(observation.getId());
         assertThat(result.getTotalFee()).isEqualByComparingTo("4.00");
+        assertThat(service.calculate(City.TALLINN, VehicleType.CAR, null).getId()).isNotEqualTo(result.getId());
+    }
+
+    @Test
+    void reusesSuccessfulHistoryAtTheInclusiveTwentyFourHourBoundaryButNotBeyondIt() {
+        addWeather("Tallinn-Harku", "5", "0", "Clear", REQUESTED_AT);
+        DeliveryFeeCalculation saved = service.calculate(City.TALLINN, VehicleType.CAR, REQUESTED_AT);
+
+        DeliveryFeeCalculation boundary = service.calculate(City.TALLINN, VehicleType.CAR, REQUESTED_AT.plusHours(24));
+        DeliveryFeeCalculation outside = service.calculate(City.TALLINN, VehicleType.CAR,
+                REQUESTED_AT.plusHours(24).plusNanos(1_000));
+
+        assertThat(boundary.getId()).isEqualTo(saved.getId());
+        assertThat(outside.getId()).isNotEqualTo(saved.getId());
+        assertThat(outside.getErrorMessage()).isEqualTo("No weather data available for the requested time");
+    }
+
+    @Test
+    void doesNotReuseHistoryForAnotherVehicleType() {
+        addWeather("Tallinn-Harku", "5", "0", "Clear", REQUESTED_AT);
+        DeliveryFeeCalculation car = service.calculate(City.TALLINN, VehicleType.CAR, REQUESTED_AT);
+
+        DeliveryFeeCalculation bike = service.calculate(City.TALLINN, VehicleType.BIKE, REQUESTED_AT);
+
+        assertThat(bike.getId()).isNotEqualTo(car.getId());
+        assertThat(bike.getVehicleType()).isEqualTo(VehicleType.BIKE);
+    }
+
+    @Test
+    void doesNotReuseFailedHistoryOrHistoryForAnotherCity() {
+        DeliveryFeeCalculation failed = service.calculate(City.TALLINN, VehicleType.CAR, REQUESTED_AT);
+        addWeather("Tallinn-Harku", "5", "0", "Clear", REQUESTED_AT);
+        DeliveryFeeCalculation nowSuccessful = service.calculate(City.TALLINN, VehicleType.CAR, REQUESTED_AT);
+        OffsetDateTime cityCheckAt = REQUESTED_AT.plusDays(2);
+        addWeather("Tartu-Tõravere", "5", "0", "Clear", cityCheckAt);
+        DeliveryFeeCalculation tartu = service.calculate(City.TARTU, VehicleType.CAR, cityCheckAt);
+        DeliveryFeeCalculation otherCity = service.calculate(City.TALLINN, VehicleType.CAR, cityCheckAt);
+
+        assertThat(failed.getErrorMessage()).isNotNull();
+        assertThat(nowSuccessful.getErrorMessage()).isNull();
+        assertThat(nowSuccessful.getId()).isNotEqualTo(failed.getId());
+        assertThat(tartu.getErrorMessage()).isNull();
+        assertThat(otherCity.getErrorMessage()).isEqualTo("No weather data available for the requested time");
+        assertThat(otherCity.getId()).isNotEqualTo(tartu.getId());
+    }
+
+    @Test
+    void selectsNearestSavedObservationAndUsesNewestCalculationForAnEquidistantTie() {
+        addWeather("Tallinn-Harku", "-12", "0", "Clear", REQUESTED_AT.minusHours(20));
+        DeliveryFeeCalculation earlier = service.calculate(City.TALLINN, VehicleType.SCOOTER, REQUESTED_AT.minusHours(20));
+        addWeather("Tallinn-Harku", "5", "0", "Clear", REQUESTED_AT.plusHours(20));
+        DeliveryFeeCalculation later = service.calculate(City.TALLINN, VehicleType.SCOOTER, REQUESTED_AT.plusHours(20));
+
+        DeliveryFeeCalculation tied = service.calculate(City.TALLINN, VehicleType.SCOOTER, REQUESTED_AT);
+
+        assertThat(earlier.getId()).isNotEqualTo(later.getId());
+        assertThat(tied.getId()).isEqualTo(later.getId());
+        assertThat(tied.getTotalFee()).isEqualByComparingTo("3.50");
     }
 
     @Test
@@ -197,4 +257,6 @@ class DeliveryFeeServiceTest {
         return weatherRepository.saveAndFlush(new WeatherObservation(station, "test-" + (++nextWmoCode),
                 new BigDecimal(temperature), new BigDecimal(wind), phenomenon, observedAt));
     }
+
+    private void clearHistory() { jdbcTemplate.update("delete from delivery_fee_calculation"); entityManager.clear(); }
 }
