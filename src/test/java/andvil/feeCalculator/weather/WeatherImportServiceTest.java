@@ -8,6 +8,12 @@ import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import andvil.feeCalculator.weather.importing.WeatherClient;
+import andvil.feeCalculator.weather.importing.WeatherClientException;
+import andvil.feeCalculator.weather.importing.WeatherImportException;
+import andvil.feeCalculator.weather.importing.WeatherImportService;
+import andvil.feeCalculator.weather.model.WeatherObservation;
+import andvil.feeCalculator.weather.persistence.WeatherRepository;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;

@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import andvil.feeCalculator.weather.importing.ImportScheduler;
+import andvil.feeCalculator.weather.importing.WeatherImportService;
 import org.junit.jupiter.api.Test;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.config.TriggerTask;

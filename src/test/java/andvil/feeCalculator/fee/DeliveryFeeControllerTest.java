@@ -6,8 +6,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import andvil.feeCalculator.weather.WeatherObservation;
-import andvil.feeCalculator.weather.WeatherRepository;
+import andvil.feeCalculator.weather.model.WeatherObservation;
+import andvil.feeCalculator.weather.persistence.WeatherRepository;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import org.junit.jupiter.api.BeforeEach;

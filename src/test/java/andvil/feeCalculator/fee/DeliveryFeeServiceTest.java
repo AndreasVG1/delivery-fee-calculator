@@ -2,8 +2,12 @@ package andvil.feeCalculator.fee;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import andvil.feeCalculator.weather.WeatherObservation;
-import andvil.feeCalculator.weather.WeatherRepository;
+import andvil.feeCalculator.fee.application.DeliveryFeeService;
+import andvil.feeCalculator.fee.model.City;
+import andvil.feeCalculator.fee.model.DeliveryFeeCalculation;
+import andvil.feeCalculator.fee.model.VehicleType;
+import andvil.feeCalculator.weather.model.WeatherObservation;
+import andvil.feeCalculator.weather.persistence.WeatherRepository;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import org.springframework.jdbc.core.JdbcTemplate;

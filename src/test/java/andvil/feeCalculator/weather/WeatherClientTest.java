@@ -11,6 +11,8 @@ import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import andvil.feeCalculator.weather.importing.WeatherClient;
+import andvil.feeCalculator.weather.importing.WeatherClientException;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

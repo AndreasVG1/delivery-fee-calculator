@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import andvil.feeCalculator.weather.model.WeatherObservation;
+import andvil.feeCalculator.weather.persistence.WeatherRepository;
 import jakarta.persistence.EntityManager;
 
 import org.junit.jupiter.api.Test;

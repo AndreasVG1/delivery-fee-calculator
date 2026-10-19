@@ -11,8 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import andvil.feeCalculator.weather.WeatherObservation;
-import andvil.feeCalculator.weather.WeatherRepository;
+import andvil.feeCalculator.weather.model.WeatherObservation;
+import andvil.feeCalculator.weather.persistence.WeatherRepository;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -279,7 +279,7 @@ class FeeConfigurationControllerTest {
             assertEquals(1, updateStatuses.stream().filter(status -> status == 409).count());
 
             JsonNode finalRules = jsonResponse("/api/configurations/wind-rules");
-            if (updateStatuses.get(0) == 200) {
+            if (updateStatuses.getFirst() == 200) {
                 assertRange(finalRules, left, 1, 18);
                 assertRange(finalRules, right, 20, 25);
             } else {
@@ -341,7 +341,7 @@ class FeeConfigurationControllerTest {
             assertEquals(1, updateStatuses.stream().filter(status -> status == 409).count());
 
             JsonNode finalRules = jsonResponse("/api/configurations/temperature-rules");
-            if (updateStatuses.get(0) == 200) {
+            if (updateStatuses.getFirst() == 200) {
                 assertRange(finalRules, low, 1, 18);
                 assertRange(finalRules, high, 20, 25);
             } else {
@@ -408,8 +408,8 @@ class FeeConfigurationControllerTest {
 
     private long phenomenonRuleId(String vehicle, String phenomenon) throws Exception {
         for (JsonNode rule : jsonResponse("/api/configurations/phenomenon-rules")) {
-            if (rule.get("vehicleType").asText().equals(vehicle)
-                    && rule.get("phenomenon").asText().equals(phenomenon)) {
+            if (rule.get("vehicleType").asString().equals(vehicle)
+                    && rule.get("phenomenon").asString().equals(phenomenon)) {
                 return rule.get("id").asLong();
             }
         }
@@ -420,7 +420,7 @@ class FeeConfigurationControllerTest {
     private List<Long> idsFor(String path, String vehicle) throws Exception {
         List<Long> ids = new ArrayList<>();
         for (JsonNode rule : jsonResponse(path)) {
-            if (rule.get("vehicleType").asText().equals(vehicle)) {
+            if (rule.get("vehicleType").asString().equals(vehicle)) {
                 ids.add(rule.get("id").asLong());
             }
         }
@@ -437,7 +437,7 @@ class FeeConfigurationControllerTest {
         JsonNode result = null;
         int count = 0;
         for (JsonNode rule : rules) {
-            if (rule.get("vehicleType").asText().equals(vehicle)) {
+            if (rule.get("vehicleType").asString().equals(vehicle)) {
                 result = rule;
                 count++;
             }

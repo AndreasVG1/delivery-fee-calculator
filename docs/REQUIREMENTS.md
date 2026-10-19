@@ -213,14 +213,14 @@ If no successful calculation matches, the application must use the nearest weath
 
 ## 6. Requirement Traceability
 
-| Requirement | Implementation                                             | Test                                                                                                            | Status      |
-|-------------|------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|-------------|
-| FR-01       | `WeatherObservation`, `WeatherRepository`                  | `WeatherRepositoryTest` (H2)                                                                                    | Completed   |
-| FR-02       | `WeatherClient`, `WeatherImportService`, `ImportScheduler` | `WeatherClientTest`, `WeatherImportServiceTest` (H2), `ImportSchedulerTest`, `ImportSchedulerConfigurationTest` | Completed   |
-| FR-03       | `FeeConfigurationService`, `FeeCalculator`, `DeliveryFeeService` | `FeeCalculatorTest`, `DeliveryFeeServiceTest`                                                   | Completed   |
-| FR-04       | `DeliveryFeeController`                                    | `DeliveryFeeControllerTest` (MockMvc, Spring context, H2)                                                       | Completed   |
-| FR-05       | `FeeConfigurationController`, `FeeConfigurationService`, four entity-specific fee rule repositories | `FeeConfigurationControllerTest` (MockMvc, Spring context, H2; CRUD, validation, range boundaries, concurrent writes, delivery-fee integration) | Completed   |
-| FR-06       | `DeliveryFeeCalculation`, `DeliveryFeeCalculationRepository`, `DeliveryFeeService`, `DeliveryFeeController` | `DeliveryFeeServiceTest` (H2), `DeliveryFeeControllerTest` (MockMvc, Spring context, H2) | Completed |
+| Requirement | Implementation                                                                                              | Test                                                                                                                                            | Status    |
+|-------------|-------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| FR-01       | `WeatherObservation`, `WeatherRepository`                                                                   | `WeatherRepositoryTest` (H2)                                                                                                                    | Completed |
+| FR-02       | `WeatherClient`, `WeatherImportService`, `ImportScheduler`                                                  | `WeatherClientTest`, `WeatherImportServiceTest` (H2), `ImportSchedulerTest`, `ImportSchedulerConfigurationTest`                                 | Completed |
+| FR-03       | `FeeConfigurationService`, `FeeCalculator`, `DeliveryFeeService`                                            | `FeeCalculatorTest`, `DeliveryFeeServiceTest`                                                                                                   | Completed |
+| FR-04       | `DeliveryFeeController`                                                                                     | `DeliveryFeeControllerTest` (MockMvc, Spring context, H2)                                                                                       | Completed |
+| FR-05       | `FeeConfigurationController`, `FeeConfigurationService`, four entity-specific fee rule repositories         | `FeeConfigurationControllerTest` (MockMvc, Spring context, H2; CRUD, validation, range boundaries, concurrent writes, delivery-fee integration) | Completed |
+| FR-06       | `DeliveryFeeCalculation`, `DeliveryFeeCalculationRepository`, `DeliveryFeeService`, `DeliveryFeeController` | `DeliveryFeeServiceTest` (H2), `DeliveryFeeControllerTest` (MockMvc, Spring context, H2)                                                        | Completed |
 
 ---
 

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 
+import andvil.feeCalculator.fee.application.FeeCalculator;
 import org.junit.jupiter.api.Test;
 
 class FeeCalculatorTest {
