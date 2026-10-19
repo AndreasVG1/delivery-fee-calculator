@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ImportScheduler implements SchedulingConfigurer {
 
-    static final String DEFAULT_CRON = "0 */10 * * * *";
+    static final String DEFAULT_CRON = "0 15 * * * *";
     private static final ZoneId SCHEDULE_ZONE = ZoneId.of("Europe/Tallinn");
 
     private final WeatherImportService weatherImportService;

@@ -38,11 +38,11 @@ weather conditions.
 
 **Acceptance Criteria:**
 
-- [ ] Regional base fees are applied correctly according to city and vehicle type.
-- [ ] Air temperature based extra fees are applied correctly based on vehicle type and air temperature.
-- [ ] Wind speed based extra fees are applied correctly based on vehicle type and wind speed.
-- [ ] Weather phenomenon based extra fees are applied correctly based on vehicle type and phenomenon.
-- [ ] Restricted delivery conditions are handled according to the specification.
+- [x] Regional base fees are applied correctly according to city and vehicle type.
+- [x] Air temperature based extra fees are applied correctly based on vehicle type and air temperature.
+- [x] Wind speed based extra fees are applied correctly based on vehicle type and wind speed.
+- [x] Weather phenomenon based extra fees are applied correctly based on vehicle type and phenomenon.
+- [x] Restricted delivery conditions are handled according to the specification.
 
 ### FR-04: REST API
 
@@ -217,7 +217,7 @@ If no successful calculation matches, the application must use the nearest weath
 |-------------|------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|-------------|
 | FR-01       | `WeatherObservation`, `WeatherRepository`                  | `WeatherRepositoryTest` (H2)                                                                                    | Completed   |
 | FR-02       | `WeatherClient`, `WeatherImportService`, `ImportScheduler` | `WeatherClientTest`, `WeatherImportServiceTest` (H2), `ImportSchedulerTest`, `ImportSchedulerConfigurationTest` | Completed   |
-| FR-03       |                                                            |                                                                                                                 | Not started |
+| FR-03       | `FeeConfigurationService`, `FeeCalculator`, `DeliveryFeeService` | `FeeCalculatorTest`, `DeliveryFeeServiceTest`                                                   | Completed   |
 | FR-04       |                                                            |                                                                                                                 | Not started |
 | FR-05       |                                                            |                                                                                                                 | Not started |
 | FR-06       |                                                            |                                                                                                                 | Not started |

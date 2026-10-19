@@ -17,4 +17,8 @@ public interface WeatherRepository extends JpaRepository<WeatherObservation, Lon
 
     /** Returns whether the observation key already exists. */
     boolean existsByWmoCodeAndObservedAt(String wmoCode, java.time.OffsetDateTime observedAt);
+
+    /** Returns station observations within the requested inclusive time window. */
+    List<WeatherObservation> findAllByStationNameAndObservedAtBetween(
+            String stationName, java.time.OffsetDateTime from, java.time.OffsetDateTime to);
 }
