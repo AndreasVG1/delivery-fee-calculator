@@ -21,14 +21,14 @@ public class DeliveryFeeService {
     private static final String NO_WEATHER = "No weather data available for the requested time";
     private static final Duration MAX_AGE = Duration.ofHours(24);
     private final WeatherRepository weatherRepository;
-    private final FeeConfigurationService feeConfigurationService;
+    private final FeeRuleResolver feeRuleResolver;
     private final FeeCalculator feeCalculator;
     private final DeliveryFeeCalculationRepository calculationRepository;
 
     /** Creates the fee service with observation lookup, rule resolution, calculation, and history storage. */
-    public DeliveryFeeService(WeatherRepository weatherRepository, FeeConfigurationService feeConfigurationService,
+    public DeliveryFeeService(WeatherRepository weatherRepository, FeeRuleResolver feeRuleResolver,
             FeeCalculator feeCalculator, DeliveryFeeCalculationRepository calculationRepository) {
-        this.weatherRepository = weatherRepository; this.feeConfigurationService = feeConfigurationService;
+        this.weatherRepository = weatherRepository; this.feeRuleResolver = feeRuleResolver;
         this.feeCalculator = feeCalculator; this.calculationRepository = calculationRepository;
     }
 
@@ -55,7 +55,7 @@ public class DeliveryFeeService {
                 .orElse(null);
         if (observation == null) return save(failed(requestedAt, calculatedAt, city, vehicle, null, NO_WEATHER));
         try {
-            ResolvedFees fees = feeConfigurationService.resolve(city, vehicle, observation.getAirTemperature(),
+            ResolvedFees fees = feeRuleResolver.resolve(city, vehicle, observation.getAirTemperature(),
                     observation.getWindSpeed(), observation.getPhenomenon());
             BigDecimal total = feeCalculator.calculate(fees.rbf(), fees.atef(), fees.wsef(), fees.wpef());
             return save(new DeliveryFeeCalculation(requestedAt, calculatedAt, city, vehicle, observation,
