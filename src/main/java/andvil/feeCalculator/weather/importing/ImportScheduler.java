@@ -9,10 +9,11 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
-/** Registers the hourly weather import in the Tallinn time zone. */
+/** Registers the configured weather import schedule in the Europe/Tallinn time zone. */
 @Component
 public class ImportScheduler implements SchedulingConfigurer {
 
+    /** Default schedule: once per hour at minute 15. */
     public static final String DEFAULT_CRON = "0 15 * * * *";
     private static final ZoneId SCHEDULE_ZONE = ZoneId.of("Europe/Tallinn");
 
@@ -26,7 +27,7 @@ public class ImportScheduler implements SchedulingConfigurer {
         this.cronExpression = cronExpression;
     }
 
-    /** Registers the import operation with Spring's task scheduler. */
+    /** Registers the configured cron expression in the Europe/Tallinn time zone. */
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         Trigger trigger = new CronTrigger(cronExpression, SCHEDULE_ZONE);

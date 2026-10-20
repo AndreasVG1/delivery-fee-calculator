@@ -8,5 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 /** Stores wind fee rules. */
 public interface WindFeeRuleRepository extends JpaRepository<WindFeeRule, Long> {
+    /** Returns all wind-speed ranges configured for the vehicle; the result may be empty. */
     List<WindFeeRule> findAllByVehicleType(VehicleType vehicleType);
 }

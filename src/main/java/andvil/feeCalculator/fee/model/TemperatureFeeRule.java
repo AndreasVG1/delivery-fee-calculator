@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 
 import jakarta.persistence.*;
 
-/** Temperature range and fee amount for a vehicle type. */
+/**
+ * Temperature range and surcharge for a vehicle. Bounds are in degrees Celsius; a null bound
+ * leaves that side unbounded. The configuration service validates amounts and overlap before saving.
+ */
 @Entity
 @Table(name = "temperature_fee_rule")
 public class TemperatureFeeRule {
@@ -23,7 +26,7 @@ public class TemperatureFeeRule {
     }
     /** Returns the persistent ID. */
     public Long getId() { return id; }
-    /** Replaces all configurable fields. */
+    /** Replaces all configurable fields without validating the range or amount. */
     public void replace(VehicleType vehicleType, BigDecimal lowerThreshold, BigDecimal upperThreshold,
                         boolean lowerInclusive, boolean upperInclusive, BigDecimal feeAmount) {
         this.vehicleType = vehicleType;

@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Exposes delivery fee calculations over HTTP. */
+/**
+ * Exposes delivery fee calculations over HTTP. Invalid parameters return 400 without storing
+ * a calculation; missing weather returns 404 and rule failures return 422 with a saved record ID.
+ */
 @RestController
 @RequestMapping("/api/delivery-fee")
 public class DeliveryFeeController {
@@ -29,7 +32,11 @@ public class DeliveryFeeController {
         this.deliveryFeeService = deliveryFeeService;
     }
 
-    /** Returns a saved or newly calculated fee for the city, vehicle, and optional ISO-8601 offset datetime. */
+    /**
+     * Calculates or reuses a fee for a case-insensitive city and vehicle name. An optional
+     * {@code datetime} must be an ISO-8601 offset datetime. Success returns a saved ID and total;
+     * a business failure returns its saved ID and error message.
+     */
     @GetMapping()
     public ResponseEntity<?> calculate(@RequestParam(required = false) String city,
             @RequestParam(required = false) String vehicleType,
@@ -51,7 +58,7 @@ public class DeliveryFeeController {
                 calculation.getRequestedAt(), calculation.getTotalFee()));
     }
 
-    /** Returns the original values of a saved calculation. */
+    /** Returns the stored values without recalculation, or 404 when the ID is unknown. */
     @GetMapping("/{id}")
     public ResponseEntity<?> getCalculation(@PathVariable long id) {
         try {

@@ -23,7 +23,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** CRUD REST interface for fee configuration. */
+/**
+ * CRUD REST interface for fee configuration. Creates return 201 with a Location header,
+ * updates return 200, and deletes return 204. Invalid data returns 400, unknown IDs
+ * return 404, and duplicate or overlapping rules return 409.
+ */
 @RestController
 @RequestMapping("/api/configurations")
 public class FeeConfigurationController {
@@ -34,20 +38,52 @@ public class FeeConfigurationController {
         this.service = service;
     }
 
-    /** Request body for a regional base fee. */
+    /**
+     * Request body for a regional base fee.
+     *
+     * @param city delivery city
+     * @param vehicleType delivery vehicle
+     * @param feeAmount non-negative base fee in euros
+     */
     public record BaseRequest(City city, VehicleType vehicleType, BigDecimal feeAmount) {}
 
-    /** Request body for a temperature fee rule. */
+    /**
+     * Temperature rule body. Null thresholds are unbounded, but both cannot be null.
+     *
+     * @param vehicleType delivery vehicle
+     * @param lowerThreshold lower temperature bound in degrees Celsius, or null
+     * @param upperThreshold upper temperature bound in degrees Celsius, or null
+     * @param lowerInclusive whether the lower bound is included
+     * @param upperInclusive whether the upper bound is included
+     * @param feeAmount non-negative surcharge in euros
+     */
     public record TemperatureRequest(VehicleType vehicleType, BigDecimal lowerThreshold,
             BigDecimal upperThreshold, Boolean lowerInclusive, Boolean upperInclusive,
             BigDecimal feeAmount) {}
 
-    /** Request body for a wind fee rule. */
+    /**
+     * Wind rule body. Null thresholds are unbounded; forbidden rules require a zero fee.
+     *
+     * @param vehicleType delivery vehicle
+     * @param lowerThreshold lower wind-speed bound in metres per second, or null
+     * @param upperThreshold upper wind-speed bound in metres per second, or null
+     * @param lowerInclusive whether the lower bound is included
+     * @param upperInclusive whether the upper bound is included
+     * @param outcome surcharge or forbidden delivery
+     * @param feeAmount non-negative surcharge in euros, zero when forbidden
+     */
     public record WindRequest(VehicleType vehicleType, BigDecimal lowerThreshold,
             BigDecimal upperThreshold, Boolean lowerInclusive, Boolean upperInclusive,
             RuleOutcome outcome, BigDecimal feeAmount) {}
 
-    /** Request body for a phenomenon fee rule. */
+    /**
+     * Phenomenon rule body. Forbidden rules require a zero fee.
+     *
+     * @param vehicleType delivery vehicle
+     * @param phenomenon category matched against provider descriptions
+     * @param outcome surcharge or forbidden delivery
+     * @param feeAmount non-negative surcharge in euros, zero when forbidden
+     */
     public record PhenomenonRequest(VehicleType vehicleType, WeatherPhenomenon phenomenon,
             RuleOutcome outcome, BigDecimal feeAmount) {}
 

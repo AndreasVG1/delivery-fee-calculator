@@ -12,7 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/** Manages validated fee configuration. */
+/**
+ * Manages active fee rules. Writes reject missing or malformed values with status 400,
+ * duplicate keys or overlapping ranges with status 409, and unknown IDs with status 404
+ * through {@link ConfigurationException}. Fees are non-negative euro amounts fitting
+ * DECIMAL(10,2); thresholds must fit DECIMAL(8,3).
+ */
 @Service
 public class FeeConfigurationService {
     private static final Sort ID_ORDER = Sort.by("id");
@@ -34,27 +39,32 @@ public class FeeConfigurationService {
         this.transactions = new TransactionTemplate(manager);
     }
 
-    /** Lists all regional base fees. */
+    /** Returns all regional base fees ordered by ID. */
     public List<RegionalBaseFee> baseFees() {
         return baseFees.findAll(ID_ORDER);
     }
 
-    /** Lists all temperature rules. */
+    /** Returns all temperature rules ordered by ID. */
     public List<TemperatureFeeRule> temperatureRules() {
         return temperatures.findAll(ID_ORDER);
     }
 
-    /** Lists all wind rules. */
+    /** Returns all wind rules ordered by ID. */
     public List<WindFeeRule> windRules() {
         return winds.findAll(ID_ORDER);
     }
 
-    /** Lists all phenomenon rules. */
+    /** Returns all phenomenon rules ordered by ID. */
     public List<PhenomenonFeeRule> phenomenonRules() {
         return phenomena.findAll(ID_ORDER);
     }
 
-    /** Creates a validated regional base fee. */
+    /**
+     * Creates a base fee for a city and vehicle pair. The pair must be unique and the amount
+     * must be a valid non-negative euro amount.
+     *
+     * @throws ConfigurationException for invalid input or an existing city and vehicle pair
+     */
     public RegionalBaseFee createBase(City city, VehicleType vehicle, BigDecimal amount) {
         return write(() -> {
             requiredEnums(city, vehicle);
@@ -66,7 +76,12 @@ public class FeeConfigurationService {
         });
     }
 
-    /** Replaces every field of a regional base fee. */
+    /**
+     * Replaces every field of a base fee, preserving its ID. The new city and vehicle pair
+     * must remain unique.
+     *
+     * @throws ConfigurationException for invalid input, an unknown ID, or a duplicate pair
+     */
     public RegionalBaseFee updateBase(long id, City city, VehicleType vehicle, BigDecimal amount) {
         return write(() -> {
             requiredEnums(city, vehicle);
@@ -82,7 +97,13 @@ public class FeeConfigurationService {
         });
     }
 
-    /** Creates a validated temperature fee rule. */
+    /**
+     * Creates a temperature surcharge range for a vehicle. At least one bound is required;
+     * null bounds are unbounded. The range must be nonempty and cannot overlap another
+     * temperature range for the same vehicle, accounting for endpoint inclusivity.
+     *
+     * @throws ConfigurationException for invalid input or an overlapping range
+     */
     public TemperatureFeeRule createTemperature(VehicleType vehicle, BigDecimal lower,
             BigDecimal upper, boolean lowerInclusive, boolean upperInclusive, BigDecimal amount) {
         return write(() -> {
@@ -95,7 +116,12 @@ public class FeeConfigurationService {
         });
     }
 
-    /** Replaces every field of a temperature rule and checks its range. */
+    /**
+     * Replaces a temperature rule while preserving its ID. The new range must be nonempty
+     * and cannot overlap another temperature rule for its vehicle.
+     *
+     * @throws ConfigurationException for invalid input, an unknown ID, or an overlapping range
+     */
     public TemperatureFeeRule updateTemperature(long id, VehicleType vehicle, BigDecimal lower,
             BigDecimal upper, boolean lowerInclusive, boolean upperInclusive, BigDecimal amount) {
         return write(() -> {
@@ -109,7 +135,13 @@ public class FeeConfigurationService {
         });
     }
 
-    /** Creates a validated wind fee rule. */
+    /**
+     * Creates a wind-speed range for a vehicle. At least one bound is required; null bounds
+     * are unbounded. The range must be nonempty and non-overlapping for that vehicle.
+     * A forbidden outcome requires a zero euro amount.
+     *
+     * @throws ConfigurationException for invalid input or an overlapping range
+     */
     public WindFeeRule createWind(VehicleType vehicle, BigDecimal lower, BigDecimal upper,
             boolean lowerInclusive, boolean upperInclusive, RuleOutcome outcome, BigDecimal amount) {
         return write(() -> {
@@ -122,7 +154,12 @@ public class FeeConfigurationService {
         });
     }
 
-    /** Replaces every field of a wind rule and checks its range. */
+    /**
+     * Replaces a wind rule while preserving its ID. The range and outcome must satisfy the
+     * same constraints as a newly created wind rule.
+     *
+     * @throws ConfigurationException for invalid input, an unknown ID, or an overlapping range
+     */
     public WindFeeRule updateWind(long id, VehicleType vehicle, BigDecimal lower, BigDecimal upper,
             boolean lowerInclusive, boolean upperInclusive, RuleOutcome outcome, BigDecimal amount) {
         return write(() -> {
@@ -136,7 +173,12 @@ public class FeeConfigurationService {
         });
     }
 
-    /** Creates a unique phenomenon rule for the vehicle. */
+    /**
+     * Creates a rule for one vehicle and phenomenon pair. The pair must be unique;
+     * a forbidden outcome requires a zero euro amount.
+     *
+     * @throws ConfigurationException for invalid input or a duplicate pair
+     */
     public PhenomenonFeeRule createPhenomenon(VehicleType vehicle, WeatherPhenomenon phenomenon,
             RuleOutcome outcome, BigDecimal amount) {
         return write(() -> {
@@ -150,7 +192,12 @@ public class FeeConfigurationService {
         });
     }
 
-    /** Replaces every field of a phenomenon rule. */
+    /**
+     * Replaces a phenomenon rule while preserving its ID. The resulting vehicle and
+     * phenomenon pair must be unique.
+     *
+     * @throws ConfigurationException for invalid input, an unknown ID, or a duplicate pair
+     */
     public PhenomenonFeeRule updatePhenomenon(long id, VehicleType vehicle,
             WeatherPhenomenon phenomenon, RuleOutcome outcome, BigDecimal amount) {
         return write(() -> {
@@ -167,42 +214,42 @@ public class FeeConfigurationService {
         });
     }
 
-    /** Returns a base fee or reports that its ID is missing. */
+    /** Returns a base fee by ID, or throws a status-404 {@link ConfigurationException}. */
     public RegionalBaseFee getBase(long id) {
         return required(baseFees, id);
     }
 
-    /** Returns a temperature rule or reports that its ID is missing. */
+    /** Returns a temperature rule by ID, or throws a status-404 {@link ConfigurationException}. */
     public TemperatureFeeRule getTemperature(long id) {
         return required(temperatures, id);
     }
 
-    /** Returns a wind rule or reports that its ID is missing. */
+    /** Returns a wind rule by ID, or throws a status-404 {@link ConfigurationException}. */
     public WindFeeRule getWind(long id) {
         return required(winds, id);
     }
 
-    /** Returns a phenomenon rule or reports that its ID is missing. */
+    /** Returns a phenomenon rule by ID, or throws a status-404 {@link ConfigurationException}. */
     public PhenomenonFeeRule getPhenomenon(long id) {
         return required(phenomena, id);
     }
 
-    /** Deletes a base fee by ID. */
+    /** Deletes a base fee by ID, or throws a status-404 {@link ConfigurationException}. */
     public void deleteBase(long id) {
         deleteEntity(baseFees, id);
     }
 
-    /** Deletes a temperature rule by ID. */
+    /** Deletes a temperature rule by ID, or throws a status-404 {@link ConfigurationException}. */
     public void deleteTemperature(long id) {
         deleteEntity(temperatures, id);
     }
 
-    /** Deletes a wind rule by ID. */
+    /** Deletes a wind rule by ID, or throws a status-404 {@link ConfigurationException}. */
     public void deleteWind(long id) {
         deleteEntity(winds, id);
     }
 
-    /** Deletes a phenomenon rule by ID. */
+    /** Deletes a phenomenon rule by ID, or throws a status-404 {@link ConfigurationException}. */
     public void deletePhenomenon(long id) {
         deleteEntity(phenomena, id);
     }

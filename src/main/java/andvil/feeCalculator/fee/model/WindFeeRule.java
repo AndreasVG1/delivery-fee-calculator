@@ -4,7 +4,11 @@ import java.math.BigDecimal;
 
 import jakarta.persistence.*;
 
-/** Wind-speed range with a surcharge or forbidden outcome for a vehicle type. */
+/**
+ * Wind-speed range with a surcharge or forbidden outcome for a vehicle. Bounds are in metres
+ * per second; a null bound leaves that side unbounded. A forbidden rule has a zero euro fee.
+ * The configuration service validates amounts and overlap before saving.
+ */
 @Entity
 @Table(name = "wind_fee_rule")
 public class WindFeeRule {
@@ -24,7 +28,7 @@ public class WindFeeRule {
     }
     /** Returns the persistent ID. */
     public Long getId() { return id; }
-    /** Replaces all configurable fields. */
+    /** Replaces all configurable fields without validating the range, outcome, or amount. */
     public void replace(VehicleType vehicleType, BigDecimal lowerThreshold, BigDecimal upperThreshold,
                         boolean lowerInclusive, boolean upperInclusive, RuleOutcome outcome, BigDecimal feeAmount) {
         this.vehicleType = vehicleType;

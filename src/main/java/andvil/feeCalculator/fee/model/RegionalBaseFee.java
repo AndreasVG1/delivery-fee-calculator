@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 
 import jakarta.persistence.*;
 
-/** Regional base amount for a city and vehicle type. */
+/**
+ * Regional base amount in euros for a city and vehicle type. The configuration service
+ * validates the amount and unique pair before saving.
+ */
 @Entity
 @Table(name = "regional_base_fee")
 public class RegionalBaseFee {
@@ -19,7 +22,7 @@ public class RegionalBaseFee {
     }
     /** Returns the persistent ID. */
     public Long getId() { return id; }
-    /** Replaces all configurable fields. */
+    /** Replaces all configurable fields without validating the amount or unique pair. */
     public void replace(City city, VehicleType vehicleType, BigDecimal feeAmount) {
         this.city = city;
         this.vehicleType = vehicleType;

@@ -7,7 +7,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class FeeCalculator {
 
-    /** Adds the regional base fee and the three weather related fee components. */
+    /**
+     * Adds the regional base fee, air temperature, wind speed, and phenomenon surcharges.
+     * All inputs must be non-null amounts in euros; rule validation happens before this call.
+     *
+     * @return the total delivery fee in euros
+     */
     public BigDecimal calculate(BigDecimal rbf, BigDecimal atef, BigDecimal wsef, BigDecimal wpef) {
         return rbf.add(atef).add(wsef).add(wpef);
     }

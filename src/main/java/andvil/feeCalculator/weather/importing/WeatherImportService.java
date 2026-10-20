@@ -43,6 +43,8 @@ public class WeatherImportService {
 
     /**
      * Fetches and imports the latest observations for Tallinn-Harku, Tartu-Tõravere, and Pärnu.
+     * Existing station and timestamp pairs are skipped, as are mapped stations with missing or
+     * invalid required values. An invalid feed fails the import without storing new observations.
      *
      * @return the number of observations newly stored
      * @throws WeatherClientException if the weather portal request fails
@@ -73,6 +75,7 @@ public class WeatherImportService {
             factory.setExpandEntityReferences(false);
             var builder = factory.newDocumentBuilder();
             builder.setErrorHandler(new DefaultHandler() {
+                /** Rejects malformed XML immediately so the import fails with its parsing error. */
                 @Override
                 public void fatalError(SAXParseException exception) throws SAXParseException {
                     throw exception;

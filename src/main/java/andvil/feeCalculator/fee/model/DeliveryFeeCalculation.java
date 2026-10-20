@@ -27,6 +27,17 @@ public class DeliveryFeeCalculation {
 
     protected DeliveryFeeCalculation() { }
 
+    /**
+     * Creates a stored outcome of a fee request. For a failed calculation, component fees and
+     * total are null and {@code errorMessage} contains the reason. The observation may be null
+     * when no weather data was available; {@code requestedAt} is null for a current-time request.
+     *
+     * @param requestedAt requested offset datetime, or null for current conditions
+     * @param calculatedAt time at which this result was calculated
+     * @param observation weather observation selected for the calculation, if any
+     * @param totalFee total in euros, or null on failure
+     * @param errorMessage failure reason, or null on success
+     */
     public DeliveryFeeCalculation(OffsetDateTime requestedAt, OffsetDateTime calculatedAt, City city,
                                   VehicleType vehicleType, WeatherObservation observation, BigDecimal rbf, BigDecimal atef,
                                   BigDecimal wsef, BigDecimal wpef, BigDecimal totalFee, String errorMessage) {
@@ -45,15 +56,15 @@ public class DeliveryFeeCalculation {
     public City getCity() { return city; }
     /** Returns the requested vehicle type. */
     public VehicleType getVehicleType() { return vehicleType; }
-    /** Returns the selected weather observation when one was found. */
+    /** Returns the selected weather observation, or null when no weather data was available. */
     public WeatherObservation getWeatherObservation() { return weatherObservation; }
-    /** Returns the regional base fee. */
+    /** Returns the regional base fee in euros, or null on failure. */
     public BigDecimal getRbf() { return rbf; }
-    /** Returns the air temperature extra fee. */
+    /** Returns the air temperature extra fee in euros, or null on failure. */
     public BigDecimal getAtef() { return atef; }
-    /** Returns the wind speed extra fee. */
+    /** Returns the wind speed extra fee in euros, or null on failure. */
     public BigDecimal getWsef() { return wsef; }
-    /** Returns the weather phenomenon extra fee. */
+    /** Returns the weather phenomenon extra fee in euros, or null on failure. */
     public BigDecimal getWpef() { return wpef; }
     /** Returns the total fee, or null for a failed calculation. */
     public BigDecimal getTotalFee() { return totalFee; }

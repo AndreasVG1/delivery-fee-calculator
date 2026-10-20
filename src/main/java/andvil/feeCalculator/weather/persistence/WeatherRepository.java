@@ -16,10 +16,13 @@ public interface WeatherRepository extends JpaRepository<WeatherObservation, Lon
      */
     List<WeatherObservation> findAllByWmoCodeOrderByObservedAtAsc(String wmoCode);
 
-    /** Returns whether the observation key already exists. */
+    /** Returns whether a station WMO code and observation time have already been imported. */
     boolean existsByWmoCodeAndObservedAt(String wmoCode, java.time.OffsetDateTime observedAt);
 
-    /** Returns station observations within the requested inclusive time window. */
+    /**
+     * Returns observations for the station whose observation times are between {@code from}
+     * and {@code to}, including both endpoints. The result may be empty and has no guaranteed order.
+     */
     List<WeatherObservation> findAllByStationNameAndObservedAtBetween(
             String stationName, java.time.OffsetDateTime from, java.time.OffsetDateTime to);
 }

@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 
 import jakarta.persistence.*;
 
-/** Fee outcome for a vehicle type and weather-phenomenon category. */
+/**
+ * Fee outcome for a vehicle and weather-phenomenon category. A forbidden rule has a zero euro
+ * fee; the configuration service validates the amount and unique pair before saving.
+ */
 @Entity
 @Table(name = "phenomenon_fee_rule")
 public class PhenomenonFeeRule {
@@ -21,7 +24,7 @@ public class PhenomenonFeeRule {
     }
     /** Returns the persistent ID. */
     public Long getId() { return id; }
-    /** Replaces all configurable fields. */
+    /** Replaces all configurable fields without validating the outcome or amount. */
     public void replace(VehicleType vehicleType, WeatherPhenomenon phenomenon,
                         RuleOutcome outcome, BigDecimal feeAmount) {
         this.vehicleType = vehicleType;

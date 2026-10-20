@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class FeeCalculatorApplication {
 
+	/** Starts the Spring Boot application and its scheduled weather import. */
 	public static void main(String[] args) {
 		SpringApplication.run(FeeCalculatorApplication.class, args);
 	}

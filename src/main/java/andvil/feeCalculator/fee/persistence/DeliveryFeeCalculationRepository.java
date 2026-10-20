@@ -13,15 +13,18 @@ import org.springframework.data.repository.query.Param;
 
 /** Append and read access to recorded delivery fee calculations. */
 public interface DeliveryFeeCalculationRepository extends Repository<DeliveryFeeCalculation, Long> {
-    /** Appends a new calculation record. */
+    /** Persists a new calculation outcome, including a failed outcome. */
     DeliveryFeeCalculation save(DeliveryFeeCalculation calculation);
 
-    /** Finds successful calculations whose observations fall in the inclusive time window. */
+    /**
+     * Finds successful calculations for the city and vehicle whose selected observation time is
+     * between {@code from} and {@code to}, inclusive. The result has no guaranteed order.
+     */
     @Query("select c from DeliveryFeeCalculation c join fetch c.weatherObservation o where c.city = :city and c.vehicleType = :vehicleType and c.errorMessage is null and o.observedAt between :from and :to")
     List<DeliveryFeeCalculation> findSuccessfulInWindow(@Param("city") City city, @Param("vehicleType") VehicleType vehicleType,
                                                         @Param("from") OffsetDateTime from, @Param("to") OffsetDateTime to);
 
-    /** Retrieves a recorded calculation and its selected observation when present. */
+    /** Returns a recorded calculation with its observation loaded, or empty for an unknown ID. */
     @Query("select c from DeliveryFeeCalculation c left join fetch c.weatherObservation where c.id = :id")
     Optional<DeliveryFeeCalculation> findWithObservationById(@Param("id") Long id);
 }

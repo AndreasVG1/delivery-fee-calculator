@@ -28,6 +28,7 @@ public class FeeRuleResolver {
     private final WindFeeRuleRepository winds;
     private final PhenomenonFeeRuleRepository phenomena;
 
+    /** Creates a resolver backed by the currently stored base and weather fee rules. */
     public FeeRuleResolver(RegionalBaseFeeRepository baseFees,
             TemperatureFeeRuleRepository temperatures, WindFeeRuleRepository winds,
             PhenomenonFeeRuleRepository phenomena) {
@@ -37,7 +38,17 @@ public class FeeRuleResolver {
         this.phenomena = phenomena;
     }
 
-    /** Resolves all component fees for the request or throws a business error. */
+    /**
+     * Resolves the four fee components using the rules currently stored for the vehicle.
+     * A matching forbidden wind or phenomenon rule takes precedence over missing rule coverage.
+     * Each temperature and wind value must match exactly one rule.
+     *
+     * @param temperature air temperature in degrees Celsius
+     * @param windSpeed wind speed in metres per second
+     * @param providerPhenomenon raw phenomenon text from the weather provider
+     * @return the regional base fee and three weather surcharges, in euros
+     * @throws FeeCalculationException when delivery is forbidden or any component lacks a unique matching rule
+     */
     public ResolvedFees resolve(City city, VehicleType vehicle, BigDecimal temperature,
             BigDecimal windSpeed, String providerPhenomenon) {
         RegionalBaseFee baseFee = baseFees.findByCityAndVehicleType(city, vehicle).orElse(null);

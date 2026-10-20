@@ -32,7 +32,17 @@ public class DeliveryFeeService {
         this.feeCalculator = feeCalculator; this.calculationRepository = calculationRepository;
     }
 
-    /** Reuses eligible historical results or saves a new calculation using nearby weather. */
+    /**
+     * Returns a successful saved result for a dated request when its city and vehicle match and
+     * its observation is within 24 hours of the requested time (inclusive). The closest observation
+     * wins; ties use the newest calculation and then the lowest ID. Otherwise selects the closest
+     * observation within the same window and saves a new result using current fee rules. Requests
+     * without a datetime always save a new result. Missing weather and business-rule failures are
+     * saved with an error message and null total instead of being thrown.
+     *
+     * @param requestedAt requested offset datetime, or null to use the current time
+     * @return a reused or newly saved calculation, including a saved failure when applicable
+     */
     @Transactional
     public DeliveryFeeCalculation calculate(City city, VehicleType vehicle, OffsetDateTime requestedAt) {
         OffsetDateTime effectiveAt = requestedAt == null ? OffsetDateTime.now() : requestedAt;
@@ -65,7 +75,11 @@ public class DeliveryFeeService {
         }
     }
 
-    /** Retrieves an immutable recorded calculation by its identifier. */
+    /**
+     * Retrieves a recorded result without recalculating it under current rules.
+     *
+     * @throws NoSuchElementException when the ID is not found
+     */
     @Transactional(readOnly = true)
     public DeliveryFeeCalculation getCalculation(long id) {
         return calculationRepository.findWithObservationById(id).orElseThrow(NoSuchElementException::new);

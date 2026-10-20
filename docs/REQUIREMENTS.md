@@ -205,13 +205,7 @@ If no successful calculation matches, the application must use the nearest weath
 **Error message:**
 `No weather data available for the requested time`
 
-## 5. Open Questions and Assumptions
-
-| ID   | Question / Assumption                                                                                          | Resolution                 |
-|------|----------------------------------------------------------------------------------------------------------------|----------------------------|
-| Q-01 | For datetime-specific requests, do we use current business rules, or also keep track of business rule changes? | Use currently active rules |
-
-## 6. Requirement Traceability
+## 5. Requirement Traceability
 
 | Requirement | Implementation                                                                                              | Test                                                                                                                                            | Status    |
 |-------------|-------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|-----------|

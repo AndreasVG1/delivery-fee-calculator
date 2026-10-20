@@ -6,7 +6,10 @@ import java.util.Locale;
 public enum WeatherPhenomenon {
     SNOW, SLEET, RAIN, GLAZE, HAIL, THUNDER, OTHER;
 
-    /** Maps known Estonian weather portal values to fee categories; unknown values are OTHER. */
+    /**
+     * Maps known weather portal descriptions, ignoring case and surrounding whitespace, to a
+     * fee-rule category. Null and unrecognized descriptions map to {@link #OTHER}.
+     */
     public static WeatherPhenomenon fromProviderValue(String value) {
         String normalized = value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
         return switch (normalized) {
